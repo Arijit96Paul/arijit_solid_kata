@@ -1,8 +1,10 @@
 package tddmicroexercises.telemetrysystem;
 
+import tddmicroexercises.telemetrysystem.TelemetryService.TelemetryService;
+
 import java.util.Random;
 
-public class TelemetryClient
+public class TelemetryClient implements TelemetryService
 {
     public static final String DIAGNOSTIC_MESSAGE = "AT#UD";
 
@@ -24,9 +26,8 @@ public class TelemetryClient
         }
 
         // simulate the operation on a real modem
-        boolean success = connectionEventsSimulator.nextInt(10) <= 8;
 
-        onlineStatus = success;
+        onlineStatus = connectionEventsSimulator.nextInt(10) <= 8;
     }
 
     public void disconnect()
@@ -36,13 +37,11 @@ public class TelemetryClient
 
     public void send(String message)
     {
-        if (message == null || "".equals(message))
-        {
+        if (message == null || message.isEmpty()) {
             throw new IllegalArgumentException();
         }
 
-        if (message.equals(DIAGNOSTIC_MESSAGE))
-        {
+        if (message.equals(DIAGNOSTIC_MESSAGE)) {
             // simulate a status report
             diagnosticMessageResult =
                   "LAST TX rate................ 100 MBPS\r\n"
@@ -60,7 +59,7 @@ public class TelemetryClient
                 + "Local Rtrn Count............ 00\r\n"
                 + "Remote Rtrn Count........... 00";
 
-            return;
+
         }
 
         // here should go the real Send operation (not needed for this exercise)
@@ -68,26 +67,26 @@ public class TelemetryClient
 
     public String receive()
     {
-        String message;
+        StringBuilder message;
 
-        if (diagnosticMessageResult == null || "".equals(diagnosticMessageResult))
+        if (diagnosticMessageResult == null || diagnosticMessageResult.isEmpty())
         {
             // simulate a received message (just for illustration - not needed for this exercise)
-            message = "";
+            message = new StringBuilder();
             int messageLength = connectionEventsSimulator.nextInt(50) + 60;
             for(int i = messageLength; i >=0; --i)
             {
-                message += (char)connectionEventsSimulator.nextInt(40) + 86;
+                message.append((char) connectionEventsSimulator.nextInt(40) + 86);
             }
             
         } 
         else
         {                
-            message = diagnosticMessageResult;
+            message = new StringBuilder(diagnosticMessageResult);
             diagnosticMessageResult = "";
         }
 
-        return message;
+        return message.toString();
     }
 }
 
